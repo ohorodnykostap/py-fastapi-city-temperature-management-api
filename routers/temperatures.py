@@ -12,16 +12,16 @@ router = APIRouter(prefix="/temperatures", tags=["Temperatures"])
 
 
 @router.post("/update")
-async def update_temperatures(
-    session: AsyncSession = Depends(get_session),
-):
+async def update_temperatures(session: AsyncSession = Depends(get_session)):
     cities = (await session.execute(select(City))).scalars().all()
 
     for city in cities:
-        temp = await fetch_temperature(city.name)
-        session.add(
-            Temperature(city_id=city.id, temperature=temp)
-        )
+        try:
+            temp = await fetch_temperature(city.name)
+            session.add(Temperature(city_id=city.id, temperature=temp))
+        except Exception as e:
+            # Можна логувати або просто ігнорувати
+            print(f"Failed to fetch temperature for {city.name}: {e}")
 
     await session.commit()
     return {"status": "ok"}

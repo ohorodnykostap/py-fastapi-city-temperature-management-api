@@ -1,12 +1,16 @@
-from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import City, Temperature
-
-async def get_cities(session: AsyncSession) -> List[City]:
-    result = await session.execute(select(City))
-    return result.scalars().all()
+from models import City
 
 
-async def get_temperatures(session: AsyncSession) -> List[Temperature]:
-    result = await session.execute(select(Temperature))
-    return result.scalars().all()
+async def create_city(session: AsyncSession, city: City) -> City:
+    session.add(city)
+    await session.commit()
+    await session.refresh(city)
+    return city
+
+async def delete_city(session: AsyncSession, city_id: int):
+    db_city = await session.get(City, city_id)
+    if not db_city:
+        raise ValueError("City not found")
+    await session.delete(db_city)
+    await session.commit()
