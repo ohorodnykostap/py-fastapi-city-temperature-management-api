@@ -17,10 +17,8 @@ async def create_city(
     return await crud.create_city(session, db_city)
 
 
-@router.get("", response_model=List[schemas.CityResponse])  # <- list[...] замінили на List[...]
-async def get_cities(
-    session: AsyncSession = Depends(get_session),
-):
+@router.get("", response_model=List[schemas.CityResponse])
+async def get_cities(session: AsyncSession = Depends(get_session)):
     return await crud.get_cities(session)
 
 
